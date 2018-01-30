@@ -1,0 +1,25 @@
+workspace(name = "YOUR_PROJECT_NAME_HERE")
+
+http_archive(
+  name = "io_tweag_rules_haskell",
+  strip_prefix = "rules_haskell-master",
+  urls = ["https://github.com/tweag/rules_haskell/archive/master.tar.gz"],
+)
+
+load("@io_tweag_rules_haskell//haskell:repositories.bzl", "haskell_repositories")
+haskell_repositories()
+
+http_archive(
+  name = "io_tweag_rules_nixpkgs",
+  strip_prefix = "rules_nixpkgs-master",
+  urls = ["https://github.com/tweag/rules_nixpkgs/archive/master.tar.gz"],
+)
+
+load("@io_tweag_rules_nixpkgs//nixpkgs:nixpkgs.bzl", "nixpkgs_package")
+
+nixpkgs_package(
+  name = "ghc",
+  attribute_path = "haskell.compiler.ghc822",
+)
+
+register_toolchains("//:ghc")

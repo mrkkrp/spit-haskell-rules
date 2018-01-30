@@ -1,0 +1,34 @@
+name:                 spit-haskell-rules
+version:              0.0.1.0
+cabal-version:        >= 1.18
+tested-with:          GHC==8.2.2
+license:              BSD3
+license-file:         LICENSE.md
+author:               Mark Karpov <markkarpov92@gmail.com>
+maintainer:           Mark Karpov <markkarpov92@gmail.com>
+homepage:             https://github.com/mrkkrp/spit-haskell-rules
+bug-reports:          https://github.com/mrkkrp/spit-haskell-rules/issues
+category:             Categories
+synopsis:             Description
+build-type:           Simple
+description:          Description.
+extra-doc-files:      CHANGELOG.md
+                    , README.md
+data-files:           data/*.mustache
+
+source-repository head
+  type:               git
+  location:           https://github.com/mrkkrp/spit-haskell-rules.git
+
+executable spit-haskell-rules
+  main-is:            Main.hs
+  hs-source-dirs:     app
+  build-depends:      aeson
+                    , base
+                    , optparse-applicative
+                    , path
+                    , path-io
+                    , stache
+                    , text
+  ghc-options:        -O2 -Wall
+  default-language:   Haskell2010
