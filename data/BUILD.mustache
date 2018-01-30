@@ -2,9 +2,10 @@ package(default_visibility = ["//visibility:pubic"])
 
 load(
   "@io_tweag_rules_haskell//haskell:haskell.bzl",
-  {{# load_rules }}
-  "{{& . }}",
-  {{/ load_rules }}
+  "haskell_library",
+  {{# insert_toolchain }}
+  "haskell_toolchain",
+  {{/ insert_toolchain }}
 )
 
 {{# insert_toolchain }}

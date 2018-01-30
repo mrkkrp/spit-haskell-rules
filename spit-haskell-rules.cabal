@@ -26,8 +26,6 @@ executable spit-haskell-rules
   build-depends:      aeson
                     , base
                     , optparse-applicative
-                    , path
-                    , path-io
                     , stache
                     , text
   ghc-options:        -O2 -Wall
