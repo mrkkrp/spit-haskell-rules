@@ -9,6 +9,8 @@ import Data.Aeson
 import Data.Char (toUpper, chr)
 import Data.List (unfoldr)
 import Options.Applicative
+import System.Directory (createDirectoryIfMissing)
+import System.FilePath ((</>))
 import Text.Mustache
 import qualified Data.Text.Lazy.IO        as TL
 import qualified Text.Mustache.Compile.TH as TH
@@ -29,19 +31,31 @@ spitPackage
   -> Int               -- ^ Depth
   -> Int               -- ^ Current index
   -> IO ()
-spitPackage isTop n i = do
+spitPackage isTop depth i = do
   let name = getName i
       ruleFile =
         if isTop
           then "BUILD"
-          else name ++ ".BUILD"
+          else name </> "BUILD"
       moduleName = formModuleName name
-      moduleFile = moduleName ++ ".hs"
+      moduleFileLocal = moduleName ++ ".hs"
+      moduleFile =
+        if isTop
+          then moduleFileLocal
+          else name </> moduleFileLocal
+      i' = i - i `rem` depth
+  unless isTop $
+    createDirectoryIfMissing True name
   TL.writeFile ruleFile . renderMustache buildTemplate . object $
     [ "insert_toolchain" .= isTop
     , "library_name"     .= name
-    , "srcs"             .= [moduleFile]
-    , "deps"             .= ([] :: [String]) -- TODO
+    , "srcs"             .= [moduleFileLocal]
+    , "deps"             .=
+      if isTop
+        then getName <$> takeWhile (< i) (iterate (+ depth) (depth - 1))
+        else if i' == i
+               then []
+               else [getName (i - 1)]
     ]
   TL.writeFile moduleFile . renderMustache moduleTemplate . object $
     [ "module_name"      .= moduleName
@@ -56,9 +70,6 @@ getName n = unfoldr f (Just n)
       in if q > 0
            then ('z', Just (i - 26))
            else (chr (r + 97), Nothing)
-
-getNamesFromTo :: Int -> Int -> [String]
-getNamesFromTo n m = getName <$> [n..m]
 
 formModuleName :: String -> String
 formModuleName ""     = ""

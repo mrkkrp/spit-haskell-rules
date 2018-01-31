@@ -25,6 +25,8 @@ executable spit-haskell-rules
   hs-source-dirs:     app
   build-depends:      aeson
                     , base
+                    , directory
+                    , filepath
                     , optparse-applicative
                     , stache
                     , text
