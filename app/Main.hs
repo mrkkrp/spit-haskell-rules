@@ -1,17 +1,20 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE TypeApplications  #-}
 
 module Main (main) where
 
 import Control.Monad
+import Crypto.Hash.Algorithms (SHA256)
 import Data.Aeson
-import Data.Char (toUpper, chr)
-import Data.List (unfoldr)
+import Data.ByteString (ByteString)
 import Options.Applicative
 import System.Directory (createDirectoryIfMissing)
 import System.FilePath ((</>))
 import Text.Mustache
+import qualified Crypto.Hash              as H
+import qualified Data.ByteString.Char8    as B
 import qualified Data.Text.Lazy.IO        as TL
 import qualified Text.Mustache.Compile.TH as TH
 
@@ -62,18 +65,10 @@ spitPackage isTop depth i = do
     ]
 
 getName :: Int -> String
-getName n = unfoldr f (Just n)
-  where
-    f Nothing = Nothing
-    f (Just i) = Just $
-      let (q,r) = i `quotRem` 26
-      in if q > 0
-           then ('z', Just (i - 26))
-           else (chr (r + 97), Nothing)
+getName = show . H.hash @ByteString @SHA256 . B.pack . show
 
 formModuleName :: String -> String
-formModuleName ""     = ""
-formModuleName (x:xs) = toUpper x : xs
+formModuleName = ("Module_" ++)
 
 ----------------------------------------------------------------------------
 -- Templates
